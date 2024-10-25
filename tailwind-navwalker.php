@@ -2,12 +2,12 @@
 /*
  * Class Name: Tailwind_Navwalker
  * Plugin Name: Tailwind Navwalker
- * Plugin URI:  https://github.com/wpvillain/tailwind-navwalker
+ * Plugin URI:  https://github.com/Ayushi-84/tailwind-navwalker
  * Description: A custom WordPress nav walker class to implement Tailwind navigation style in a custom theme using the WordPress built in menu manager.
  * Author: Edward McIntyre - @twittem, WP Bootstrap, William Patton - @pattonwebz
  * Version: 4.1.0
- * Author URI: https://github.com/wpvillain/tailwind-navwalker
- * GitHub Plugin URI: https://github.com/wpvillain/tailwind-navwalker
+ * Author URI: https://github.com/Ayushi-84/tailwind-navwalker
+ * GitHub Plugin URI: https://github.com/Ayushi-84/tailwind-navwalker
  * GitHub Branch: master
  * License: GPL-3.0+
  * License URI: http://www.gnu.org/licenses/gpl-3.0.txt
@@ -135,11 +135,27 @@ if (!class_exists('Tailwind_Navwalker')) {
             }
             if (in_array('current-menu-item', $classes, true) || in_array('current-menu-parent', $classes, true)) {
                 $classes[] = 'active';
+                $classes[] = 'text-amber-400';
             }
+
+            // dd($args);
+
+               // Add a custom hover class
+        if ($depth === 0) {
+            $classes[] = 'main-menu-item'; // This is the class you'll target for the hover effect
+            $classes[] = 'relative';
+            $classes[] = 'text-white';
+            $classes[] = 'font-bold';
+        } else {
+            $classes[] = 'sub-menu-item';
+            $classes[] = 'text-black';
+        }
 
             // Add some additional default classes to the item.
             $classes[] = 'menu-item-' . $item->ID;
             $classes[] = 'nav-item';
+            $classes[] = 'font-raleway';
+            $classes[] = 'text-sm';
 
             // Allow filtering the classes.
             $classes = apply_filters('nav_menu_css_class', array_filter($classes), $item, $args, $depth);
