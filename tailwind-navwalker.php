@@ -142,20 +142,24 @@ if (!class_exists('Tailwind_Navwalker')) {
 
                // Add a custom hover class
         if ($depth === 0) {
-            $classes[] = 'main-menu-item'; // This is the class you'll target for the hover effect
+            $classes[] = 'main-menu-item'; // Top-level nav item hover target
             $classes[] = 'relative';
             $classes[] = 'text-white';
-            $classes[] = 'font-bold';
+            $classes[] = 'font-semibold';  // 600 — matches custom Blade nav items
+            $classes[] = 'text-[15px]';    // matches About / Courses / Campuses toggles
+            $classes[] = 'leading-[1.5]';  // consistent line-height
         } else {
             $classes[] = 'sub-menu-item';
             $classes[] = 'text-black';
+            $classes[] = 'font-medium';    // dropdown items: 500 weight
+            $classes[] = 'text-sm';        // dropdown items: 14px
+            $classes[] = 'leading-relaxed'; // airy line-height for readability
         }
 
             // Add some additional default classes to the item.
             $classes[] = 'menu-item-' . $item->ID;
             $classes[] = 'nav-item';
             $classes[] = 'font-raleway';
-            $classes[] = 'text-sm';
 
             // Allow filtering the classes.
             $classes = apply_filters('nav_menu_css_class', array_filter($classes), $item, $args, $depth);
@@ -196,17 +200,18 @@ if (!class_exists('Tailwind_Navwalker')) {
             // If item has_children add atts to <a>.
             if (isset($args->has_children) && $args->has_children && 0 === $depth && $args->depth > 1) {
                 $atts['href']          = !empty($item->url) ? $item->url : '';
-                $atts['data-toggle']         = 'dropdown';
+                $atts['data-toggle']   = 'dropdown';
                 $atts['aria-haspopup'] = 'true';
-                $atts['class']         = 'dropdown-toggle nav-link';
+                // Add flex layout so text + caret sit inline
+                $atts['class']         = 'dropdown-toggle nav-link flex items-center gap-1.5 transition-colors duration-150';
                 $atts['id']            = 'menu-item-dropdown-' . $item->ID;
             } else {
                 $atts['href'] = !empty($item->url) ? $item->url : '#';
                 // Items in dropdowns use .dropdown-item instead of .nav-link.
                 if ($depth > 0) {
-                    $atts['class'] = 'dropdown-item';
+                    $atts['class'] = 'dropdown-item flex items-center gap-2 transition-colors duration-150';
                 } else {
-                    $atts['class'] = 'nav-link';
+                    $atts['class'] = 'nav-link flex items-center gap-1.5 transition-colors duration-150';
                 }
             }
 
@@ -283,7 +288,17 @@ if (!class_exists('Tailwind_Navwalker')) {
             }
 
             // Put the item contents into $output.
-            $item_output .= isset($args->link_before) ? $args->link_before . $icon_html . $title . $args->link_after : '';
+            // For top-level items that have children, append an SVG chevron caret
+            // inline so it rotates on hover (replaces the old CSS ::after character approach).
+            $caret_svg = '';
+            if (isset($args->has_children) && $args->has_children && 0 === $depth) {
+                $caret_svg = '<svg xmlns="http://www.w3.org/2000/svg"'
+                    . ' class="nav-caret h-4 w-4 transition-transform duration-200 opacity-90 group-hover:rotate-180 shrink-0"'
+                    . ' fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">'
+                    . '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />'
+                    . '</svg>';
+            }
+            $item_output .= isset($args->link_before) ? $args->link_before . $icon_html . $title . $caret_svg . $args->link_after : '';
             /**
              * This is the end of the internal nav item. We need to close the
              * correct element depending on the type of link or link mod.
